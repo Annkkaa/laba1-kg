@@ -118,45 +118,45 @@ def render_mesh(img, zbuf, vertices, faces, proj_scale, shift_x, shift_y): # о�
         if norm_n == 0.0: # если равно нулю то пропускаем                          
             continue
 
-        cos_alpha = nz / norm_n # нормализуем нормаль и берем ее z                                                              
+        cos_alpha = nz / norm_n # нормализуем нормаль и берем ее z компоненту                                                          
 
-        if cos_alpha < 0.0:
-            intensity = int(INTENSITY_SCALE * cos_alpha)
-            if intensity < COLOR_MIN:
+        if cos_alpha < 0.0: # нормаль смотрит в камеру
+            intensity = int(INTENSITY_SCALE * cos_alpha) # яркость
+            if intensity < COLOR_MIN: # ограничение
                 intensity = COLOR_MIN
             if intensity > COLOR_MAX:
                 intensity = COLOR_MAX
 
-            px0 = int(proj_scale * x0 + shift_x)
+            px0 = int(proj_scale * x0 + shift_x) # перевод из 3D в 2D
             py0 = int(-proj_scale * y0 + shift_y)
             px1 = int(proj_scale * x1 + shift_x)
             py1 = int(-proj_scale * y1 + shift_y)
             px2 = int(proj_scale * x2 + shift_x)
             py2 = int(-proj_scale * y2 + shift_y)
 
-            rasterize_triangle(img, zbuf, px0, py0, px1, py1, px2, py2, z0, z1, z2, intensity, 0, 0)
-            drawn += 1
+            rasterize_triangle(img, zbuf, px0, py0, px1, py1, px2, py2, z0, z1, z2, intensity, 0, 0) # растеризируем
+            drawn += 1 # увеличение счетчика
 
-    return drawn
+    return drawn # возврат количества
 
 class Renderer:
     def __init__(self, width, height):
-        self.W = width
-        self.H = height
-        self.img = np.zeros((height, width, 3), dtype=np.uint8)
-        self.zbuf = np.full((height, width), Z_BUFFER_INIT, dtype=np.float64)
-        self.proj_scale = PROJ_SCALE
+        self.W = width # ширина
+        self.H = height # высота
+        self.img = np.zeros((height, width, 3), dtype=np.uint8) # черный массив изображения с тремя цветовыми каналами uint8
+        self.zbuf = np.full((height, width), Z_BUFFER_INIT, dtype=np.float64) # z buffer того же размера заполненным начальным значением float64
+        self.proj_scale = PROJ_SCALE # проекция
         self.shift_x = PROJ_SHIFT_X
         self.shift_y = PROJ_SHIFT_Y
 
     def render(self, scene):
-        verts = np.array(scene.vertices, dtype=np.float64)
+        verts = np.array(scene.vertices, dtype=np.float64) # преобразуем списки из scene в строгие массивы numpy
         faces_arr = np.array(scene.faces, dtype=np.int64)
-        render_mesh(self.img, self.zbuf, verts, faces_arr, self.proj_scale, self.shift_x, self.shift_y)
+        render_mesh(self.img, self.zbuf, verts, faces_arr, self.proj_scale, self.shift_x, self.shift_y) # отрисовка
 
     def save(self, filename):
-        img = Image.fromarray(self.img)
-        img.save(filename)
+        img = Image.fromarray(self.img) # преобразуем
+        img.save(filename) # сохраняем
 
 class App:
     def __init__(self, scene, renderer, win_w=APP_WIN_W, win_h=APP_WIN_H):
