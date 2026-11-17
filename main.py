@@ -219,7 +219,7 @@ class Renderer:
         verts = np.array(scene.vertices, dtype=np.float64) # преобразуем списки из scene в строгие массивы numpy
         faces_arr = np.array(scene.faces, dtype=np.int64)
 
-        # Задание 18: [X',Y',Z']^T = R [X,Y,Z]^T + [tx,ty,tz]^T
+        # [X',Y',Z']^T = R [X,Y,Z]^T + [tx,ty,tz]^T
         R = rotation_matrix(self.alpha, self.beta, self.gamma)
         c = self.center
         # t = (tx,ty,tz) + c - R c.
